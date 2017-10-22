@@ -157,7 +157,7 @@ class Editor extends React.Component {
           <Button
             color="primary"
             raised
-            disabled={canPublish}
+            disabled={!canPublish}
             onClick={publish}
           >
             Publish

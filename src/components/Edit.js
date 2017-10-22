@@ -6,14 +6,14 @@ import { firebaseConnect, isEmpty, isLoaded } from 'react-redux-firebase'
 import { withStyles, LinearProgress } from 'material-ui'
 import Editor from './Editor'
 
-const canPublish = post => {
-  if (!post.title) return false
-  if (!post.lastPublished) return true
-  if (!post.published) return true
-  return post.updated > post.lastPublished
+const canPublish = metadata => {
+  if (!metadata.title) return false
+  if (!metadata.lastPublished) return true
+  if (!metadata.published) return true
+  return metadata.updated > metadata.lastPublished
 }
 
-const Edit = ({ classes, content, publish, save }) => {
+const Edit = ({ classes, content, metadata, publish, save }) => {
   if (!isLoaded(content)) return <LinearProgress />
 
   if (isEmpty(content)) return <div>Not found</div>
@@ -23,7 +23,7 @@ const Edit = ({ classes, content, publish, save }) => {
       <Editor
         value={content.body}
         onChange={save}
-        canPublish={canPublish(content)}
+        canPublish={canPublish(metadata)}
         publish={publish}
       />
     </div>
@@ -36,11 +36,15 @@ export default compose(
     id: props.match.params.id,
   })),
 
-  // fetch the content from the database into the store
-  firebaseConnect(({ id }) => [`/private/content/${id}`]),
+  // fetch the metadata and content from the database into the store
+  firebaseConnect(({ id }) => [
+    `/private/metadata/${id}`,
+    `/private/content/${id}`
+  ]),
 
   // load the metadata and content from the store
   connect((state, { id }) => ({
+    metadata: get(state.firebase.data, `private.metadata.${id}`),
     content: get(state.firebase.data, `private.content.${id}`),
   })),
 
