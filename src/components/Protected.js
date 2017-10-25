@@ -1,7 +1,7 @@
 import React from 'react'
 import { compose } from 'recompose'
 import { connect } from 'react-redux'
-import LinearProgress from 'material-ui/Progress/LinearProgress'
+import { LinearProgress } from 'material-ui'
 import { subscribe, access, isEmpty, isLoaded } from '../db'
 
 const Protected = ({ auth, children }) => {
@@ -22,6 +22,6 @@ export default compose(
   subscribe(['auth']),
 
   connect(state => access(state, {
-    auth: ['auth']
+    auth: 'auth'
   })),
 )(Protected)

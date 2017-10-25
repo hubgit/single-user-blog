@@ -3,7 +3,6 @@ import get from 'lodash/get'
 import mapValues from 'lodash/mapValues'
 import { combineReducers, compose, createStore } from 'redux'
 import { firebaseStateReducer, reactReduxFirebase } from 'react-redux-firebase'
-import { reducer as menuReducer } from './menu'
 import { firebase as firebaseConfig } from './config'
 
 firebase.initializeApp(firebaseConfig)
@@ -12,12 +11,13 @@ export const store = (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose)(
   reactReduxFirebase(firebase)
 )(createStore)(combineReducers({
   firebase: firebaseStateReducer,
-  menu: menuReducer
 }))
 
 export { firebaseConnect as subscribe, isLoaded, isEmpty } from 'react-redux-firebase'
 
-export const access = (state, fields) => mapValues(fields, path => get(state.firebase, path))
+export const access = (state, fields) => {
+  return mapValues(fields, path => get(state.firebase, path))
+}
 
 export const login = () => () => firebase.login({
   provider: 'google'
@@ -48,8 +48,6 @@ export const update = ({ id }) => async ({ body }) => {
   const h1 = doc.querySelector('h1')
   const title = h1 ? h1.textContent : null
 
-  const updated = firebase.database.ServerValue.TIMESTAMP
-
   // TODO: transaction?
 
   await Promise.all([
@@ -58,7 +56,7 @@ export const update = ({ id }) => async ({ body }) => {
     }),
     firebase.update(`/private/metadata/${id}`, {
       title,
-      updated
+      updated: firebase.database.ServerValue.TIMESTAMP
     }),
   ])
 }

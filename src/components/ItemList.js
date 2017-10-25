@@ -1,14 +1,13 @@
 import React from 'react'
 import { compose } from 'recompose'
-import List from 'material-ui/List'
-import withStyles from 'material-ui/styles/withStyles'
+import { List, withStyles } from 'material-ui'
 import Item from './Item'
 
-const ItemList = ({ classes, items }) => (
+const ItemList = ({ classes, items, openMenu }) => (
   <div className={classes.list}>
     <List>
-      {Object.keys(items).filter(key => items[key]).reverse().map(key => (
-        <Item key={key} id={key} item={items[key]}/>
+      {items.map(item => (
+        <Item key={item.key} id={item.key} item={item.value} openMenu={openMenu}/>
       ))}
     </List>
   </div>

@@ -1,9 +1,7 @@
 import React from 'react'
 import { compose, withHandlers } from 'recompose'
 import { withRouter } from 'react-router-dom'
-import Button from 'material-ui/Button'
-import Icon from 'material-ui/Icon'
-import Tooltip from 'material-ui/Tooltip'
+import { Button, Icon, Tooltip } from 'material-ui'
 import { create } from '../db'
 
 const Create = ({ create }) => (

@@ -1,15 +1,14 @@
 import React from 'react'
-import { compose } from 'recompose'
+import { compose, withState, withHandlers } from 'recompose'
 import { connect } from 'react-redux'
-import LinearProgress from 'material-ui/Progress/LinearProgress'
-import withStyles from 'material-ui/styles/withStyles'
+import { LinearProgress, withStyles } from 'material-ui'
 import { subscribe, isEmpty, isLoaded, access } from '../db'
 
 import Create from './Create'
 import ItemList from './ItemList'
 import Actions from './Actions'
 
-const Items = ({ classes, items }) => {
+const Items = ({ classes, items, menu, openMenu, closeMenu }) => {
   if (!isLoaded(items)) return (
     <LinearProgress />
   )
@@ -20,11 +19,11 @@ const Items = ({ classes, items }) => {
         {isEmpty(items) ? (
           <div className={classes.intro}>Welcome</div>
         ) : (
-          <ItemList items={items}/>
+          <ItemList items={items} openMenu={openMenu}/>
         )}
       </div>
 
-      <Actions/>
+      <Actions menu={menu} closeMenu={closeMenu}/>
 
       <div className={classes.create}>
         <Create/>
@@ -35,12 +34,26 @@ const Items = ({ classes, items }) => {
 
 export default compose(
   // fetch the list of metadata from the database into the store
-  subscribe([`private/metadata#orderByChild=created`]),
+  subscribe([{
+    path: 'private/metadata',
+    queryParams: ['orderByChild=created'], // TODO: descending
+  }]),
 
   // load the list of items from the store
   connect(state => access(state, {
-    items: ['data', 'private', 'metadata']
+    items: ['ordered', 'private', 'metadata']
   })),
+
+  withState('menu', 'setMenu', { open: false }),
+
+  withHandlers({
+    openMenu: ({ setMenu }) => (id, item, anchor) => {
+      setMenu({ open: true, id, item, anchor })
+    },
+    closeMenu: ({ setMenu }) => () => {
+      setMenu({ open: false })
+    },
+  }),
 
   withStyles(theme => ({
     main: {

@@ -1,11 +1,7 @@
 import React from 'react'
 import { compose, withHandlers } from 'recompose'
 import { connect } from 'react-redux'
-import Avatar from 'material-ui/Avatar'
-import Button from 'material-ui/Button'
-import CircularProgress from 'material-ui/Progress/CircularProgress'
-import IconButton from 'material-ui/IconButton'
-import Tooltip from 'material-ui/Tooltip'
+import { Avatar, Button, CircularProgress, IconButton, Tooltip } from 'material-ui'
 import { subscribe, access, isEmpty, isLoaded, login, logout } from '../db'
 
 const Auth = ({ auth, login, logout }) => {

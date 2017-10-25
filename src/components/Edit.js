@@ -1,11 +1,9 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { compose, withHandlers, withProps } from 'recompose'
-import LinearProgress from 'material-ui/Progress/LinearProgress'
-import Button from 'material-ui/Button'
-import withStyles from 'material-ui/styles/withStyles'
-import Editor from '@aeaton/editor-contenteditable'
-import { subscribe, isLoaded, isEmpty, publish, update, access } from '../db'
+import { LinearProgress, Button, withStyles } from 'material-ui'
+import Editor from 'contenteditable-material-ui'
+import { subscribe, access, isLoaded, isEmpty, publish, update } from '../db'
 
 const canPublish = metadata => {
   if (!metadata.title) return false
@@ -15,6 +13,7 @@ const canPublish = metadata => {
 }
 
 const Edit = ({ classes, content, metadata, publish, update }) => {
+
   if (!isLoaded(content)) return (
     <LinearProgress />
   )
@@ -52,14 +51,14 @@ export default compose(
 
   // fetch the metadata and content from the database into the store
   subscribe(({ id }) => [
-    ['private', 'metadata', id],
-    ['private', 'content', id],
+    `private/metadata/${id}`,
+    `private/content/${id}`,
   ]),
 
   // load the metadata and content from the store
   connect((state, { id }) => access(state, {
-    metadata: ['private', 'metadata', id],
-    content: ['private', 'content', id],
+    metadata: ['data', 'private', 'metadata', id],
+    content: ['data', 'private', 'content', id],
   })),
 
   // write to the database on events
