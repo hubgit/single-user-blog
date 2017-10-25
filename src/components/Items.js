@@ -1,15 +1,18 @@
 import React from 'react'
-import get from 'lodash/get'
-import { compose } from 'redux'
+import { compose } from 'recompose'
 import { connect } from 'react-redux'
-import { firebaseConnect, isEmpty, isLoaded } from 'react-redux-firebase'
-import { withStyles, LinearProgress, List } from 'material-ui'
+import LinearProgress from 'material-ui/Progress/LinearProgress'
+import withStyles from 'material-ui/styles/withStyles'
+import { subscribe, isEmpty, isLoaded, access } from '../db'
+
 import Create from './Create'
-import Item from './Item'
+import ItemList from './ItemList'
 import Actions from './Actions'
 
 const Items = ({ classes, items }) => {
-  if (!isLoaded(items)) return <LinearProgress />
+  if (!isLoaded(items)) return (
+    <LinearProgress />
+  )
 
   return (
     <div>
@@ -17,13 +20,7 @@ const Items = ({ classes, items }) => {
         {isEmpty(items) ? (
           <div className={classes.intro}>Welcome</div>
         ) : (
-          <div className={classes.list}>
-            <List>
-              {Object.keys(items).filter(key => items[key]).reverse().map(key => (
-                <Item key={key} id={key} item={items[key]}/>
-              ))}
-            </List>
-          </div>
+          <ItemList items={items}/>
         )}
       </div>
 
@@ -38,20 +35,17 @@ const Items = ({ classes, items }) => {
 
 export default compose(
   // fetch the list of metadata from the database into the store
-  firebaseConnect([`/private/metadata#orderByChild=created`]),
+  subscribe([`private/metadata#orderByChild=created`]),
 
   // load the list of items from the store
-  connect(state => ({
-    items: get(state.firebase.data, `private.metadata`),
+  connect(state => access(state, {
+    items: ['data', 'private', 'metadata']
   })),
 
   withStyles(theme => ({
     main: {
       display: 'flex',
       justifyContent: 'center',
-    },
-    list: {
-      width: '50em',
     },
     intro: {
       padding: 100,
@@ -61,5 +55,7 @@ export default compose(
       bottom: theme.spacing.unit * 2,
       right: theme.spacing.unit * 2,
     }
-  }))
+  }), {
+    name: 'Items'
+  })
 )(Items)

@@ -1,10 +1,11 @@
 import React from 'react'
-import get from 'lodash/get'
 import { connect } from 'react-redux'
-import { compose, withProps, withHandlers } from 'recompose'
-import { firebaseConnect, isEmpty, isLoaded } from 'react-redux-firebase'
-import { withStyles, LinearProgress } from 'material-ui'
-import Editor from './Editor'
+import { compose, withHandlers, withProps } from 'recompose'
+import LinearProgress from 'material-ui/Progress/LinearProgress'
+import Button from 'material-ui/Button'
+import withStyles from 'material-ui/styles/withStyles'
+import Editor from '@aeaton/editor-contenteditable'
+import { subscribe, isLoaded, isEmpty, publish, update, access } from '../db'
 
 const canPublish = metadata => {
   if (!metadata.title) return false
@@ -13,18 +14,31 @@ const canPublish = metadata => {
   return metadata.updated > metadata.lastPublished
 }
 
-const Edit = ({ classes, content, metadata, publish, save }) => {
-  if (!isLoaded(content)) return <LinearProgress />
+const Edit = ({ classes, content, metadata, publish, update }) => {
+  if (!isLoaded(content)) return (
+    <LinearProgress />
+  )
 
-  if (isEmpty(content)) return <div>Not found</div>
+  if (isEmpty(content)) return (
+    <div>Not found</div>
+  )
+
+  const PublishButton = () => (
+    <Button
+      color="primary"
+      raised
+      disabled={!canPublish(metadata)}
+      onClick={publish}>
+      Publish
+    </Button>
+  )
 
   return (
     <div className={classes.editor}>
       <Editor
         value={content.body}
-        onChange={save}
-        canPublish={canPublish(metadata)}
-        publish={publish}
+        onChange={update}
+        components={{ PublishButton }}
       />
     </div>
   )
@@ -37,68 +51,21 @@ export default compose(
   })),
 
   // fetch the metadata and content from the database into the store
-  firebaseConnect(({ id }) => [
-    `/private/metadata/${id}`,
-    `/private/content/${id}`
+  subscribe(({ id }) => [
+    ['private', 'metadata', id],
+    ['private', 'content', id],
   ]),
 
   // load the metadata and content from the store
-  connect((state, { id }) => ({
-    metadata: get(state.firebase.data, `private.metadata.${id}`),
-    content: get(state.firebase.data, `private.content.${id}`),
+  connect((state, { id }) => access(state, {
+    metadata: ['private', 'metadata', id],
+    content: ['private', 'content', id],
   })),
 
   // write to the database on events
-  withHandlers({
-    save: ({ firebase, id }) => async ({ body }) => {
-      const parser = new DOMParser()
+  withHandlers({ publish, update }),
 
-      const doc = parser.parseFromString(body, 'text/html')
-      const h1 = doc.querySelector('h1')
-      const title = h1 ? h1.textContent : null
-
-      const updated = firebase.database.ServerValue.TIMESTAMP
-
-      // TODO: transaction?
-
-      await Promise.all([
-        firebase.update(`/private/content/${id}`, {
-          body
-        }),
-        firebase.update(`/private/metadata/${id}`, {
-          title,
-          updated
-        }),
-      ])
-    },
-    publish: ({ firebase, id }) => async () => {
-      const load = path =>
-        firebase.ref(path).once('value').then(snapshot => snapshot.val())
-
-      const metadata = await load(`/private/metadata/${id}`)
-      const content = await load(`/private/content/${id}`)
-
-      const updated = firebase.database.ServerValue.TIMESTAMP
-      const published = metadata.published || updated
-
-      // TODO: transaction?
-      await Promise.all([
-        firebase.set(`/public/content/${id}`, {
-          ...content
-        }),
-        firebase.set(`/public/metadata/${id}`, {
-          ...metadata,
-          published,
-          updated
-        }),
-        firebase.update(`/private/metadata/${id}`, {
-          published,
-          lastPublished: updated,
-        }),
-      ])
-    },
-  }),
-
+  // fill the page
   withStyles({
     editor: {
       position: 'fixed',
@@ -108,5 +75,7 @@ export default compose(
       bottom: 0,
       overflow: 'hidden',
     },
-  })
+  }, {
+    name: 'Edit'
+  }),
 )(Edit)

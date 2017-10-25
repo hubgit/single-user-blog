@@ -1,21 +1,27 @@
 import React from 'react'
 import { compose } from 'recompose'
 import { connect } from 'react-redux'
-import { firebaseConnect, isEmpty, isLoaded } from 'react-redux-firebase'
-import { LinearProgress } from 'material-ui'
+import LinearProgress from 'material-ui/Progress/LinearProgress'
+import { subscribe, access, isEmpty, isLoaded } from '../db'
 
 const Protected = ({ auth, children }) => {
-  if (!isLoaded(auth)) return <LinearProgress />
+  if (!isLoaded(auth)) return (
+    <LinearProgress />
+  )
 
-  if (isEmpty(auth)) return <div />
+  if (isEmpty(auth)) return (
+    <div />
+  )
 
-  return <div>{children}</div>
+  return (
+    <div>{children}</div>
+  )
 }
 
 export default compose(
-  firebaseConnect(['/auth']),
+  subscribe(['auth']),
 
-  connect(state => ({
-    auth: state.firebase.auth,
-  }))
+  connect(state => access(state, {
+    auth: ['auth']
+  })),
 )(Protected)

@@ -1,6 +1,11 @@
 import React from 'react'
+import { compose } from 'recompose'
 import { Link } from 'react-router-dom'
-import { withStyles, AppBar, Icon, Toolbar, Tooltip } from 'material-ui'
+import AppBar from 'material-ui/AppBar'
+import Icon from 'material-ui/Icon'
+import Toolbar from 'material-ui/Toolbar'
+import Tooltip from 'material-ui/Tooltip'
+import withStyles from 'material-ui/styles/withStyles'
 
 const Nav = ({ children, classes }) => (
   <AppBar position="static" color="inherit">
@@ -16,13 +21,17 @@ const Nav = ({ children, classes }) => (
   </AppBar>
 )
 
-export default withStyles({
-  link: {
-    color: 'inherit',
-    textDecoration: 'none',
-    display: 'inline-block',
-    '&:hover': {
-      color: 'cornflowerblue',
+export default compose(
+  withStyles({
+    link: {
+      color: 'inherit',
+      textDecoration: 'none',
+      display: 'inline-block',
+      '&:hover': {
+        color: 'cornflowerblue',
+      },
     },
-  },
-})(Nav)
+  }, {
+    name: 'Nav'
+  })
+)(Nav)

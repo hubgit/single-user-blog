@@ -1,4 +1,4 @@
-import { createMuiTheme } from 'material-ui'
+import createMuiTheme from 'material-ui/styles/createMuiTheme'
 
 export default createMuiTheme({
   overrides: {

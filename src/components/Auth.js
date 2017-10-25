@@ -1,20 +1,21 @@
 import React from 'react'
 import { compose, withHandlers } from 'recompose'
 import { connect } from 'react-redux'
-import { firebaseConnect, isEmpty, isLoaded } from 'react-redux-firebase'
-import { Avatar, Button, CircularProgress, IconButton, Tooltip } from 'material-ui'
+import Avatar from 'material-ui/Avatar'
+import Button from 'material-ui/Button'
+import CircularProgress from 'material-ui/Progress/CircularProgress'
+import IconButton from 'material-ui/IconButton'
+import Tooltip from 'material-ui/Tooltip'
+import { subscribe, access, isEmpty, isLoaded, login, logout } from '../db'
 
-const provider = 'google'
+const Auth = ({ auth, login, logout }) => {
+  if (!isLoaded(auth)) return (
+    <CircularProgress size={48} />
+  )
 
-const Auth = ({ classes, auth, login, logout }) => {
-  if (!isLoaded(auth)) return <CircularProgress size={48} />
-
-  if (isEmpty(auth))
-    return (
-      <Button color="primary" onClick={login}>
-        Sign in
-      </Button>
-    )
+  if (isEmpty(auth)) return (
+    <Button color="primary" onClick={login}>Sign in</Button>
+  )
 
   return (
     <Tooltip title="Sign out" placement="left">
@@ -26,14 +27,11 @@ const Auth = ({ classes, auth, login, logout }) => {
 }
 
 export default compose(
-  firebaseConnect(['/auth']),
+  subscribe(['auth']),
 
-  connect(state => ({
-    auth: state.firebase.auth,
+  connect(state => access(state, {
+    auth: 'auth'
   })),
 
-  withHandlers({
-    login: ({ firebase }) => () => firebase.login({ provider }),
-    logout: ({ firebase }) => () => firebase.logout({ provider }),
-  })
+  withHandlers({ login, logout })
 )(Auth)

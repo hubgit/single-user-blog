@@ -1,8 +1,10 @@
-import * as React from 'react'
+import React from 'react'
 import { compose, withHandlers } from 'recompose'
-import { firebaseConnect } from 'react-redux-firebase'
 import { withRouter } from 'react-router-dom'
-import { Button, Icon, Tooltip } from 'material-ui'
+import Button from 'material-ui/Button'
+import Icon from 'material-ui/Icon'
+import Tooltip from 'material-ui/Tooltip'
+import { create } from '../db'
 
 const Create = ({ create }) => (
   <Tooltip title="Add" placement="left">
@@ -13,23 +15,7 @@ const Create = ({ create }) => (
 )
 
 export default compose(
-  firebaseConnect(),
-
   withRouter,
 
-  withHandlers({
-    create: ({ firebase, history }) => async () => {
-      const created = firebase.database.ServerValue.TIMESTAMP
-      const body = '<h1>Untitled</h1>'
-
-      const item = await firebase.push(`/private/metadata`, {
-        created
-      })
-      await firebase.set(`/private/content/${item.key}`, {
-        body
-      })
-
-      history.push(`/edit/${item.key}`)
-    },
-  })
+  withHandlers({ create })
 )(Create)
