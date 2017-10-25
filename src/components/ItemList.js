@@ -6,7 +6,7 @@ import Item from './Item'
 const ItemList = ({ classes, items, openMenu }) => (
   <div className={classes.list}>
     <List>
-      {items.map(item => (
+      {items.length && items.map(item => (
         <Item key={item.key} id={item.key} item={item.value} openMenu={openMenu}/>
       ))}
     </List>

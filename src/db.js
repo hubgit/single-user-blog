@@ -41,7 +41,7 @@ export const create = ({ history }) => async () => {
   history.push(`/edit/${item.key}`)
 }
 
-export const update = ({ id }) => async ({ body }) => {
+export const update = ({ id }) => async body => {
   const parser = new DOMParser()
 
   const doc = parser.parseFromString(body, 'text/html')

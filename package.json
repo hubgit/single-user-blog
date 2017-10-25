@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "license": "MIT",
   "dependencies": {
-    "babel-polyfill": "^6.26.0",
+    "@aeaton/react-prosemirror": "^0.8.1",
+    "@aeaton/react-prosemirror-config-default": "^0.7.3",
     "classnames": "^2.2.5",
-    "contenteditable-material-ui": "^0.0.2",
     "firebase": "^4.6.0",
     "lodash": "^4.17.4",
     "material-design-icons": "^3.0.1",
