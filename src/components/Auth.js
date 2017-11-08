@@ -1,13 +1,11 @@
 import React from 'react'
 import { compose, withHandlers } from 'recompose'
 import { connect } from 'react-redux'
-import { Avatar, Button, CircularProgress, IconButton, Tooltip } from 'material-ui'
+import { Avatar, Button, IconButton, Tooltip } from 'material-ui'
 import { subscribe, access, isEmpty, isLoaded, login, logout } from '../db'
 
 const Auth = ({ auth, login, logout }) => {
-  if (!isLoaded(auth)) return (
-    <CircularProgress size={48} />
-  )
+  if (!isLoaded(auth)) return null
 
   if (isEmpty(auth)) return (
     <Button color="primary" onClick={login}>Sign in</Button>

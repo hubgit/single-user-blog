@@ -1,0 +1,35 @@
+{
+  "rules": {
+    "public": {
+      ".read": true,
+      "metadata": {
+        "$id": {
+          ".write": "auth.uid != null && auth.uid == newData.child('owner').val() && (!data.exists() || auth.uid == data.child('owner').val())"
+        },
+        ".indexOn": "published"
+      },
+      "content": {
+        "$id": {
+          ".write": "auth.uid != null && auth.uid == newData.child('owner').val() && (!data.exists() || auth.uid == data.child('owner').val())"
+        }
+      }
+    },
+    "private": {
+      ".read": "root.child('users').child(auth.uid).child('admin').val() === true",
+      "$uid": {
+        ".read": "auth.uid == $uid",
+        ".write": "auth.uid == $uid",
+        "metadata": {
+          ".indexOn": "created"
+        }
+      }
+    },
+    "users": {
+      ".read": "root.child('users').child(auth.uid).child('admin').val() === true",
+      "$uid": {
+        ".read": "auth.uid == $uid",
+        ".write": false
+      }
+    }
+  }
+}

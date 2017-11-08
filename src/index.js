@@ -8,28 +8,30 @@ import 'typeface-roboto'
 import 'material-design-icons/iconfont/material-icons.css'
 import './index.css'
 
-import { store } from './db'
+import { setup } from './db'
 import theme from './theme'
 
 import App from './components/App'
 
-const render = () => {
-  ReactDOM.render(
-    <StoreProvider store={store}>
-      <MuiThemeProvider theme={theme}>
-        <BrowserRouter>
-          <App/>
-        </BrowserRouter>
-      </MuiThemeProvider>
-    </StoreProvider>,
-    document.getElementById('root')
-  )
-}
+setup().then(store => {
+  const render = () => {
+    ReactDOM.render(
+      <StoreProvider store={store}>
+        <MuiThemeProvider theme={theme}>
+          <BrowserRouter>
+            <App/>
+          </BrowserRouter>
+        </MuiThemeProvider>
+      </StoreProvider>,
+      document.getElementById('root')
+    )
+  }
 
-render()
+  render()
 
-if (module.hot) {
-  module.hot.accept('./components/App', () => {
-    render()
-  })
-}
+  if (module.hot) {
+    module.hot.accept('./components/App', () => {
+      render()
+    })
+  }
+})

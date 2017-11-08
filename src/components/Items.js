@@ -8,7 +8,7 @@ import Create from './Create'
 import ItemList from './ItemList'
 import Actions from './Actions'
 
-const Items = ({ classes, items, menu, openMenu, closeMenu }) => {
+const Items = ({ uid, classes, items, menu, openMenu, closeMenu }) => {
   if (!isLoaded(items)) return (
     <LinearProgress />
   )
@@ -33,15 +33,20 @@ const Items = ({ classes, items, menu, openMenu, closeMenu }) => {
 }
 
 export default compose(
+  // load the user id from the store
+  connect(state => access(state, {
+    uid: ['auth', 'uid']
+  })),
+
   // fetch the list of metadata from the database into the store
-  subscribe([{
-    path: 'private/metadata',
+  subscribe(({ uid }) => [{
+    path: `/private/${uid}/metadata`,
     queryParams: ['orderByChild=created'], // TODO: descending
   }]),
 
   // load the list of items from the store
-  connect(state => access(state, {
-    items: ['ordered', 'private', 'metadata']
+  connect((state, { uid }) => access(state, {
+    items: ['ordered', 'private', uid, 'metadata']
   })),
 
   withState('menu', 'setMenu', { open: false }),

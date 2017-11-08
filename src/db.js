@@ -1,17 +1,32 @@
-import firebase from 'firebase'
+import firebase from 'firebase/app'
+import 'firebase/auth'
+import 'firebase/database'
 import get from 'lodash/get'
 import mapValues from 'lodash/mapValues'
 import { combineReducers, compose, createStore } from 'redux'
 import { firebaseStateReducer, reactReduxFirebase } from 'react-redux-firebase'
-import { firebase as firebaseConfig } from './config'
 
-firebase.initializeApp(firebaseConfig)
+const config = () => {
+  if (process.env.NODE_ENV === 'production') {
+    return fetch('/__/firebase/init.json')
+      .then(response => response.json())
+      .then(firebase.initializeApp)
+  }
 
-export const store = (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose)(
-  reactReduxFirebase(firebase)
-)(createStore)(combineReducers({
-  firebase: firebaseStateReducer,
-}))
+  return import('./config')
+}
+
+export const setup = async () => {
+  await config().then(firebase.initializeApp)
+
+  return (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose)(
+    reactReduxFirebase(firebase, {
+      userProfile: 'users'
+    })
+  )(createStore)(combineReducers({
+    firebase: firebaseStateReducer,
+  }))
+}
 
 export { firebaseConnect as subscribe, isLoaded, isEmpty } from 'react-redux-firebase'
 
@@ -31,10 +46,13 @@ export const create = ({ history }) => async () => {
   const created = firebase.database.ServerValue.TIMESTAMP
   const body = '<h1>Untitled</h1>'
 
-  const item = await firebase.push(`/private/metadata`, {
+  const uid = firebase.auth().currentUser.uid
+
+  const item = await firebase.push(`/private/${uid}/metadata`, {
     created
   })
-  await firebase.set(`/private/content/${item.key}`, {
+
+  await firebase.set(`/private/${uid}/content/${item.key}`, {
     body
   })
 
@@ -48,13 +66,15 @@ export const update = ({ id }) => async body => {
   const h1 = doc.querySelector('h1')
   const title = h1 ? h1.textContent : null
 
+  const uid = firebase.auth().currentUser.uid
+
   // TODO: transaction?
 
   await Promise.all([
-    firebase.update(`/private/content/${id}`, {
+    firebase.update(`/private/${uid}/content/${id}`, {
       body
     }),
-    firebase.update(`/private/metadata/${id}`, {
+    firebase.update(`/private/${uid}/metadata/${id}`, {
       title,
       updated: firebase.database.ServerValue.TIMESTAMP
     }),
@@ -69,23 +89,60 @@ export const remove = ({ menu: { id }, closeMenu }) => async event => {
     return
   }
 
+  const uid = firebase.auth().currentUser.uid
+
   // TODO: transaction?
   await Promise.all([
-    firebase.remove(`/public/content/${id}`),
-    firebase.remove(`/public/metadata/${id}`),
-    firebase.remove(`/private/content/${id}`),
-    firebase.remove(`/private/metadata/${id}`),
+    firebase.remove(`/public/${uid}/content/${id}`),
+    firebase.remove(`/public/${uid}/metadata/${id}`),
+    firebase.remove(`/private/${uid}/content/${id}`),
+    firebase.remove(`/private/${uid}/metadata/${id}`),
   ])
 
   closeMenu()
 }
 
-export const publish = ({ id }) => async () => {
-  const load = path =>
+export const queue = ({ id }) => async () => {
+  const load = path => (
     firebase.ref(path).once('value').then(snapshot => snapshot.val())
+  )
 
-  const metadata = await load(`/private/metadata/${id}`)
-  const content = await load(`/private/content/${id}`)
+  const uid = firebase.auth().currentUser.uid
+
+  const metadata = await load(`/private/${uid}/metadata/${id}`)
+  const content = await load(`/private/${uid}/content/${id}`)
+
+  const updated = firebase.database.ServerValue.TIMESTAMP
+  const queued = metadata.queued || updated
+
+  // TODO: transaction?
+  await Promise.all([
+    firebase.set(`/queue/content/${id}`, {
+      ...content,
+      owner: uid,
+    }),
+    firebase.set(`/queue/metadata/${id}`, {
+      ...metadata,
+      owner: uid,
+      queued,
+      updated
+    }),
+    firebase.update(`/private/${uid}/metadata/${id}`, {
+      queued,
+      lastQueued: updated,
+    }),
+  ])
+}
+
+export const publish = ({ id }) => async () => {
+  const load = path => (
+    firebase.ref(path).once('value').then(snapshot => snapshot.val())
+  )
+
+  const uid = firebase.auth().currentUser.uid
+
+  const metadata = await load(`/queue/metadata/${id}`)
+  const content = await load(`/queue/content/${id}`)
 
   const updated = firebase.database.ServerValue.TIMESTAMP
   const published = metadata.published || updated
@@ -93,14 +150,16 @@ export const publish = ({ id }) => async () => {
   // TODO: transaction?
   await Promise.all([
     firebase.set(`/public/content/${id}`, {
-      ...content
+      ...content,
+      owner: uid,
     }),
     firebase.set(`/public/metadata/${id}`, {
       ...metadata,
+      owner: uid,
       published,
       updated
     }),
-    firebase.update(`/private/metadata/${id}`, {
+    firebase.update(`/queue/metadata/${id}`, {
       published,
       lastPublished: updated,
     }),
@@ -110,12 +169,14 @@ export const publish = ({ id }) => async () => {
 export const unpublish = ({ menu: { id }, closeMenu }) => async event => {
   event.preventDefault()
 
+  const uid = firebase.auth().currentUser.uid
+
   await Promise.all([
     firebase.remove(`/public/content/${id}`),
     firebase.remove(`/public/metadata/${id}`),
   ])
 
-  await firebase.update(`/private/metadata/${id}`, {
+  await firebase.update(`/queue/${uid}/metadata/${id}`, {
     published: null
   })
 
