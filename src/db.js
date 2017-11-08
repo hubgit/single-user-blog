@@ -139,8 +139,6 @@ export const publish = ({ id }) => async () => {
     firebase.ref(path).once('value').then(snapshot => snapshot.val())
   )
 
-  const uid = firebase.auth().currentUser.uid
-
   const metadata = await load(`/queue/metadata/${id}`)
   const content = await load(`/queue/content/${id}`)
 
@@ -150,12 +148,10 @@ export const publish = ({ id }) => async () => {
   // TODO: transaction?
   await Promise.all([
     firebase.set(`/public/content/${id}`, {
-      ...content,
-      owner: uid,
+      ...content
     }),
     firebase.set(`/public/metadata/${id}`, {
       ...metadata,
-      owner: uid,
       published,
       updated
     }),

@@ -8,9 +8,8 @@ import { subscribe, access, isLoaded, isEmpty, queue, update } from '../db'
 
 const canQueue = metadata => {
   if (!metadata.title) return false
-  if (!metadata.lastPublished) return true
-  if (!metadata.published) return true
-  return metadata.updated > metadata.lastPublished
+  if (!metadata.lastQueued) return true
+  return metadata.updated > metadata.lastQueued
 }
 
 const Edit = ({ classes, content, metadata, queue, update }) => {
@@ -29,7 +28,7 @@ const Edit = ({ classes, content, metadata, queue, update }) => {
       dense
       disabled={!canQueue(metadata)}
       onClick={queue}>
-      Queue
+      Send
     </Button>
   )
 
