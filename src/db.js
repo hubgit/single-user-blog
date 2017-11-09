@@ -116,6 +116,7 @@ export const queue = ({ id }) => async () => {
   const queued = metadata.queued || updated
 
   // TODO: transaction?
+  // TODO: push to the queue instead of overwriting
   await Promise.all([
     firebase.set(`/queue/content/${id}`, {
       ...content,

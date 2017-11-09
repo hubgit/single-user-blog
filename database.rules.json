@@ -2,9 +2,16 @@
   "rules": {
     "public": {
       ".read": true,
-      ".write": "root.child('users').child(auth.uid).child('admin').val() === true",
       "metadata": {
+        "$id": {
+          ".write": "auth.uid != null && auth.uid == newData.child('owner').val() && (!data.exists() || auth.uid == data.child('owner').val())"
+        },
         ".indexOn": "published"
+      },
+      "content": {
+        "$id": {
+          ".write": "auth.uid != null && auth.uid == newData.child('owner').val() && (!data.exists() || auth.uid == data.child('owner').val())"
+        }
       }
     },
     "queue": {
@@ -13,7 +20,7 @@
         "$id": {
           ".write": "auth.uid != null && auth.uid == newData.child('owner').val() && (!data.exists() || auth.uid == data.child('owner').val())"
         },
-        ".indexOn": "queued"
+        ".indexOn": "published"
       },
       "content": {
         "$id": {

@@ -7,11 +7,11 @@ import { IconButton, ListItem, ListItemSecondaryAction, ListItemText, withStyles
 const Metadata = ({ item }) => (
   <span>
     <span>
-      {item.published ? 'Published ' : 'Created '}
+      {item.queued ? 'Sent ' : 'Created '}
     </span>
 
     <Moment format="YYYY-MM-DD">
-      {item.published || item.created}
+      {item.queued || item.created}
     </Moment>
   </span>
 )
