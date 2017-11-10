@@ -13,9 +13,7 @@ const Protected = ({ auth, children }) => {
     <div />
   )
 
-  return (
-    <div>{children}</div>
-  )
+  return children
 }
 
 export default compose(

@@ -22,11 +22,17 @@
     "redux": "^3.7.2",
     "typeface-roboto": "^0.0.41"
   },
+  "devDependencies": {
+    "firebase-tools": "^3.15.0"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "setup": "firebase use --add",
+    "predeploy": "npm run build",
+    "deploy": "firebase deploy"
   },
   "engines": {
     "node": "8.x"

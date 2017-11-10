@@ -1,14 +1,13 @@
 ## Setup
 
+1. Inside this project folder, run `npm install` to install the project's dependencies.
 1. Create a new project in the [Firebase console](https://console.firebase.google.com/).
-1. In the Develop > Authentication > Sign-in Method settings, enable "Google" as a sign-in provider for this project.
-1. Use `npm -g install firebase-tools` or `yarn global add firebase-tools` to install the Firebase CLI tools locally.
-1. Inside this project folder, run `firebase use --add` and select the id of the new project (choose whatever you like as the alias).
-1. Run `npm install` to install the dependencies.
+1. In "Develop > Authentication > Sign-in Method", enable "Google" as a sign-in provider.
+1. Use `npm run setup` locally to select the id of the new project (choose whatever you like as the alias).
 
 ## Deployment
 
-`npm run build && firebase deploy`
+`npm run deploy`
 
 ## Development
 
