@@ -4,15 +4,15 @@ import { compose, withHandlers, withProps } from 'recompose'
 import { LinearProgress, Button, withStyles } from 'material-ui'
 import { HtmlEditor, MenuBar } from '@aeaton/react-prosemirror'
 import { options, menu } from '@aeaton/react-prosemirror-config-default'
-import { subscribe, access, isLoaded, isEmpty, queue, update } from '../db'
+import { subscribe, access, isLoaded, isEmpty, publish, update } from '../db'
 
-const canQueue = metadata => {
+const canPublish = metadata => {
   if (!metadata.title) return false
-  if (!metadata.lastQueued) return true
-  return metadata.updated > metadata.lastQueued
+  if (!metadata.lastPublished) return true
+  return metadata.updated > metadata.lastPublished
 }
 
-const Edit = ({ classes, content, metadata, queue, update }) => {
+const Edit = ({ classes, content, metadata, publish, update }) => {
   if (!isLoaded(content)) return (
     <LinearProgress />
   )
@@ -26,9 +26,9 @@ const Edit = ({ classes, content, metadata, queue, update }) => {
       color="primary"
       raised
       dense
-      disabled={!canQueue(metadata)}
-      onClick={queue}>
-      Send
+      disabled={!canPublish(metadata)}
+      onClick={publish}>
+      Publish
     </Button>
   )
 
@@ -36,6 +36,8 @@ const Edit = ({ classes, content, metadata, queue, update }) => {
     <HtmlEditor
       options={options}
       value={content.body}
+      autoFocus
+      placeholder="Start typing…"
       onChange={update}
       render={({ editor, state, dispatch }) => (
         <div className={classes.root}>
@@ -79,7 +81,7 @@ export default compose(
   })),
 
   // write to the database on events
-  withHandlers({ queue, update }),
+  withHandlers({ publish, update }),
 
   // fill the page
   withStyles({

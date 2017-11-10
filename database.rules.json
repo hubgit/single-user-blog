@@ -14,20 +14,6 @@
         }
       }
     },
-    "queue": {
-      ".read": "root.child('users').child(auth.uid).child('admin').val() === true",
-      "metadata": {
-        "$id": {
-          ".write": "auth.uid != null && auth.uid == newData.child('owner').val() && (!data.exists() || auth.uid == data.child('owner').val())"
-        },
-        ".indexOn": "published"
-      },
-      "content": {
-        "$id": {
-          ".write": "auth.uid != null && auth.uid == newData.child('owner').val() && (!data.exists() || auth.uid == data.child('owner').val())"
-        }
-      }
-    },
     "private": {
       ".read": "root.child('users').child(auth.uid).child('admin').val() === true",
       "$uid": {

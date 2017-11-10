@@ -2,7 +2,6 @@ import React from 'react'
 import { compose } from 'recompose'
 import { Link } from 'react-router-dom'
 import { AppBar, Icon, Toolbar, Tooltip, withStyles } from 'material-ui'
-import Network from './Network'
 import Auth from './Auth'
 
 const Nav = ({ children, classes }) => (
@@ -14,10 +13,7 @@ const Nav = ({ children, classes }) => (
         </Link>
       </Tooltip>
 
-      <span>
-        <Network/>
-        <Auth/>
-      </span>
+      <Auth/>
     </Toolbar>
   </AppBar>
 )
