@@ -117,6 +117,9 @@ export default compose(
       mozOsxFontSmoothing: 'grayscale',
       mozFontFeatureSettings: '"liga" on',
       color: 'rgba(0, 0, 0, 0.8)',
+      // '& ::selection': {
+      //   background: '#84cef4'
+      // },
       '&:focus': {
         outline: 'none',
       },
