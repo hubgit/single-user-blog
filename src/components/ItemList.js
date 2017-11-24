@@ -1,24 +1,17 @@
 import React from 'react'
-import { compose } from 'recompose'
 import { List, withStyles } from 'material-ui'
 import Item from './Item'
 
 const ItemList = ({ classes, items, openMenu }) => (
-  <div className={classes.list}>
-    <List>
-      {items.length && items.map(item => (
-        <Item key={item.key} id={item.key} item={item.value} openMenu={openMenu}/>
-      ))}
-    </List>
-  </div>
+  <List className={classes.list}>
+    {items.length && items.map(item => (
+      <Item key={item.key} id={item.key} item={item.value} openMenu={openMenu}/>
+    ))}
+  </List>
 )
 
-export default compose(
-  withStyles(theme => ({
-    list: {
-      width: '50em',
-    },
-  }), {
-    name: 'Items'
-  })
-)(ItemList)
+export default withStyles({
+  list: {
+    maxWidth: '50em'
+  }
+})(ItemList)

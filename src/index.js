@@ -11,7 +11,7 @@ import './index.css'
 import { setup } from './db'
 import theme from './theme'
 
-import App from './components/App'
+import App from './App'
 
 setup().then(store => {
   const render = () => {
@@ -30,7 +30,7 @@ setup().then(store => {
   render()
 
   if (module.hot) {
-    module.hot.accept('./components/App', () => {
+    module.hot.accept('./App', () => {
       render()
     })
   }

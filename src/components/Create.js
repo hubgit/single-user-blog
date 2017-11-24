@@ -14,6 +14,5 @@ const Create = ({ create }) => (
 
 export default compose(
   withRouter,
-
   withHandlers({ create })
 )(Create)

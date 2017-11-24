@@ -1,9 +1,9 @@
 import React from 'react'
 import { Route } from 'react-router-dom'
-import Edit from './Edit'
-import Items from './Items'
-import Nav from './Nav'
-import Protected from './Protected'
+import Edit from './pages/Edit'
+import Items from './pages/Items'
+import Nav from './components/Nav'
+import Protected from './components/Protected'
 
 const App = () => (
   <div>

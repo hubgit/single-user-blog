@@ -7,10 +7,10 @@ import { combineReducers, compose, createStore } from 'redux'
 import { firebaseStateReducer, reactReduxFirebase } from 'react-redux-firebase'
 
 const config = () => {
-  if (process.env.NODE_ENV === 'production') {
-    return fetch('/__/firebase/init.json')
-      .then(response => response.json())
-  }
+  // if (process.env.NODE_ENV === 'production') {
+  //   return fetch('/__/firebase/init.json')
+  //     .then(response => response.json())
+  // }
 
   return Promise.resolve({
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,

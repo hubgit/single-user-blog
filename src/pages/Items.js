@@ -3,12 +3,13 @@ import { compose, withState, withHandlers } from 'recompose'
 import { connect } from 'react-redux'
 import { LinearProgress, withStyles } from 'material-ui'
 import { subscribe, isEmpty, isLoaded, access } from '../db'
+import styles from './Items.style'
 
-import Create from './Create'
-import ItemList from './ItemList'
-import Actions from './Actions'
+import Create from '../components/Create'
+import ItemList from '../components/ItemList'
+import Actions from '../components/Actions'
 
-const Items = ({ uid, classes, items, menu, openMenu, closeMenu }) => {
+const Items = ({ classes, items, menu, openMenu, closeMenu }) => {
   if (!isLoaded(items)) return (
     <LinearProgress />
   )
@@ -60,20 +61,5 @@ export default compose(
     },
   }),
 
-  withStyles(theme => ({
-    main: {
-      display: 'flex',
-      justifyContent: 'center',
-    },
-    intro: {
-      padding: 100,
-    },
-    create: {
-      position: 'fixed',
-      bottom: theme.spacing.unit * 2,
-      right: theme.spacing.unit * 2,
-    }
-  }), {
-    name: 'Items'
-  })
+  withStyles(styles, { name: 'Items' })
 )(Items)

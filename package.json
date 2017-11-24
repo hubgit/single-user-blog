@@ -20,7 +20,7 @@
     "react-scripts": "^1.0.14",
     "recompose": "^0.26.0",
     "redux": "^3.7.2",
-    "typeface-roboto": "^0.0.41"
+    "typeface-roboto": "^0.0.45"
   },
   "devDependencies": {
     "firebase-tools": "^3.15.0"
